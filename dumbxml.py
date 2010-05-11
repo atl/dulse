@@ -35,16 +35,6 @@ def tonum(string):
             out = string
     return out
 
-class SimpleXML(object):
-    defaut_extensions = ['xml']
-    parser = SimpleXMLParser()
-    
-    @classmethod
-    def handler(cls, stream):
-        out = cls.parser.parse(stream)
-        return out
-
-
 class SimpleXMLParser(object):
     """
     Simple XML parser class that completely disregards attributes, and
@@ -145,3 +135,5 @@ class SimpleXMLParser(object):
             elif event == 'START_ELEMENT' and node.nodeName not in self.skip:
                 addtodict(d, node.nodeName, self.get_simple_xml_content(node.nodeName))
         return d
+    
+
