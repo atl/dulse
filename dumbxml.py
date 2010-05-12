@@ -1,7 +1,11 @@
 from xml.dom import pulldom
+import xml.sax
+import xml.sax.handler
 from xml.sax.saxutils import unescape
 from types import StringTypes
 from xml.dom import Node
+
+xml.sax.handler.feature_validation = False
 
 def addtodict(dictionary, key, value):
     if not isinstance(dictionary, dict):
@@ -81,6 +85,10 @@ class SimpleXMLParser(object):
             self.mixed = set(mixed)
         self.skip = skip
         self.events = None
+        self._parser = xml.sax.make_parser()
+        self._parser.setFeature(xml.sax.handler.feature_validation, 0)
+        self._parser.setFeature(xml.sax.handler.feature_external_ges, 0)
+        self._parser.setFeature(xml.sax.handler.feature_external_pes, 0)
     
     def add_mixed(self, *args):
         for item in args:
@@ -122,8 +130,13 @@ class SimpleXMLParser(object):
                     return tonum(d)
             (event, currnode) = self.events.next()
     
-    def parse(self, stream):
-        self.events = pulldom.parse(stream)
+    def parse(self, stream_or_string):
+        self._parser.reset()
+        if isinstance(stream_or_string, basestring):
+            stream = open(stream_or_string)
+        else:
+            stream = stream_or_string
+        self.events = pulldom.DOMEventStream(stream, self._parser, pulldom.default_bufsize)
         depth = 0
         d = {}
         for event, node in self.events:
