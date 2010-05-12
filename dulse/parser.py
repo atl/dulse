@@ -2,10 +2,11 @@ from xml.dom import pulldom
 import xml.sax
 import xml.sax.handler
 from xml.sax.saxutils import unescape
-from types import StringTypes
 from xml.dom import Node
-
-xml.sax.handler.feature_validation = False
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
 
 def addtodict(dictionary, key, value):
     if not isinstance(dictionary, dict):
@@ -116,7 +117,7 @@ class SimpleXMLParser(object):
             elif event == 'START_ELEMENT' and currnode.nodeName not in self.skip:
                 addtodict(d, currnode.nodeName, self.get_simple_xml_content(currnode.nodeName))
             elif event == 'CHARACTERS' and currnode.data.strip():
-                if isinstance(d, StringTypes):
+                if isinstance(d, basestring):
                     d += unescape(currnode.data.lstrip())
                 elif not d.keys():
                     d = unescape(currnode.data.lstrip())
