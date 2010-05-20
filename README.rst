@@ -69,6 +69,9 @@ The unifying project fell by the wayside, but I revisited the code for another p
 The basic design worked well, but then I did some basic speed profiling, and discovered that although it was simple, the approach using the pulldom wasn't necessarily as fast as expected. 
 After reworking the code to use ElementTree, the module was ready to be let out into the wild.
 
+This exists as released code because I couldn't easily find an equivalent myself when I've looked (there seem to be a few similar ActiveState recipes, though).
+It's released as open source so that it might be easier for *me* to find it later.
+
 License
 -------
 
