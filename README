@@ -18,17 +18,19 @@ Dulse is unapologetically lossy. Besides the ordering and attribute simplificati
 Customization
 =============
 
-By default, Dulse tries to be as clever and sensitive as possible about the underlying content, including checking for mixed content and converting to numeric types as aggressively as possible. If you know more about the underlying content model, you can turn off features as desired. For example, if you know there's no mixed content, you can instantiate a parser that doesn't constantly check for it:
+By default, Dulse tries to be as clever and sensitive as possible about the underlying content, including checking for mixed content and converting to numeric types as aggressively as possible. If you know more about the underlying content model, you can turn off features as desired, sometimes resulting in a significant performance gain. For example, if you know there's no mixed content, you can instantiate a parser that doesn't constantly check for it:
 
     import dulse
     p = dulse.Parser(mixed_content=False)
     d = p.parse("hamlet.xml")
 
-Similarly, if you don't need to convert to numeric types, you can use one of the provided conversion functions, NUMBER (default), STRING, or NO_CONVERSION:
+If you know ahead of time which elements are expected to contain mixed content, then you can sidestep the expensive blind checking and explicitly parse accounting for the mixed content elements:
 
-    import dulse
-    p = dulse.Parser(conversion=dulse.STRING)
-    d = p.parse("hamlet.xml")
+    d = dulse.parse("hamlet.xml", mixed_elements=['LINE'])
+
+Similarly, if you don't need to convert to numeric types, you can use one of the provided conversion functions, NUMBER_OR_COLLAPSE (default), NUMBER, COLLAPSE_WHITESPACE, STRING, or NO_CONVERSION:
+
+    d = dulse.parse("hamlet.xml", conversion=dulse.STRING)
 
 Alternatively, you can convert each value using a function of your devising, and passing it into the conversion option of dulse.Parser().
 
@@ -37,4 +39,4 @@ Alternatively, you can convert each value using a function of your devising, and
 History & approach
 ==================
 
-Dulse began as an exercise in the pulldom and in trying to unify access between different textual encodings. The unifying project fell by the wayside, but I revisited the code for another project that perhaps should have used JSON. The basic design worked well, but then I did some basic speed profiling, and discovered that although it was simple, our approach using the pulldom wasn't necessarily as fast as expected. After reworking the code to use ElementTree, the module was ready to be let out into the wild.
+Dulse began as an exercise in the pulldom and in trying to unify access between different textual encodings. The unifying project fell by the wayside, but I revisited the code for another project that -- had I chosen the data carrier format -- could have used JSON, but used XML. The basic design worked well, but then I did some basic speed profiling, and discovered that although it was simple, the approach using the pulldom wasn't necessarily as fast as expected. After reworking the code to use ElementTree, the module was ready to be let out into the wild.

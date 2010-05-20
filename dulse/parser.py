@@ -22,6 +22,18 @@ def addtodict(dictionary, key, value):
         else:
             dictionary[key].append(value)
 
+def NUMBER_OR_COLLAPSE(string):
+    try:
+        return int(string)
+    except (ValueError, TypeError):
+        try:
+            return float(string)
+        except (ValueError, TypeError):
+            if string:
+                return " ".join(string.split()) or None
+            else:
+                return None
+
 def NUMBER(string):
     try:
         return int(string)
@@ -33,6 +45,12 @@ def NUMBER(string):
                 return string.strip() or None
             else:
                 return None
+
+def COLLAPSE_WHITESPACE(string):
+    try:
+        return " ".join(string.split())
+    except AttributeError:
+        return None
 
 def STRING(string):
     try:
@@ -80,13 +98,25 @@ class SimpleXMLParser(object):
          'endnote': ['This is the first.', 'This is the last.'],
          'title': 'My Book'}
     
+    This might not be the ideal form for your uses. If so, then you can change
+    the way mixed content is handled and the way elements are converted::
+    
+        parse("sample.xml", conversion=COLLAPSE_WHITESPACE, mixed_elements=['content'])
+    
+    resulting in::
+        {'author': 'Me',
+         'content': "<h1>Chapter 1</h1><p><em>These</em> are the times that try mens' soles....</p>",
+         'date': '23 April 2009',
+         'endnote': ['This is the first.', 'This is the last.'],
+         'title': 'My Book'}
+    
     """
     def __init__(self, conversion=None, mixed_content=True, mixed_elements=None):
         self.events = None
         if conversion:
             self.conversion = conversion
         else:
-            self.conversion = NUMBER
+            self.conversion = NUMBER_OR_COLLAPSE
         if not mixed_content:
             self.is_mixed = lambda x: False
         if mixed_elements:
@@ -96,14 +126,13 @@ class SimpleXMLParser(object):
     def is_mixed(ele):
         return bool((none_strip(ele.text) and ele.getchildren()) or 
             any(map(lambda x: none_strip(x.tail), ele.getchildren())))
-
-    @staticmethod
-    def get_mixed(z):
+    
+    def get_mixed(self, z):
         if z.text:
             y = z.text + ''.join(map(etree.tostring, z.getchildren()))
         else:
             y = ''.join(map(etree.tostring, z.getchildren()))
-        return y.strip()
+        return self.conversion(y)
     
     def get_simple_xml_content(self, parentnode):
         d = {}
