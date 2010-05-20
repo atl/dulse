@@ -1,3 +1,2 @@
-from dulse.eparser import SimpleXMLParser as Parser
-
-from dulse.eparser import NUMBER, STRING, NO_CONVERSION
+from dulse.parser import SimpleXMLParser as Parser
+from dulse.parser import NUMBER, STRING, NO_CONVERSION
