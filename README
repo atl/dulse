@@ -1,3 +1,7 @@
+=============
+=   Dulse   =
+=============
+
 Dumb, but light & simple module for the extensible markup language.
 Dicts, unicode & lists seem enough.
 
@@ -15,10 +19,10 @@ Dulse begrudgingly supports mixed content, unmarshalling the whole span of mixed
 Dulse neither preserves nor cares about the root element.
 Dulse is unapologetically lossy. Besides the ordering and attribute simplifications, it strips whitespace and ignores comments. You are highly unlikely to be able to reproduce the input from the output.
 
-Customization
-=============
+Parser customization
+====================
 
-By default, Dulse tries to be as clever and sensitive as possible about the underlying content, including checking for mixed content and converting to numeric types as aggressively as possible. If you know more about the underlying content model, you can turn off features as desired, sometimes resulting in a significant performance gain. For example, if you know there's no mixed content, you can instantiate a parser that doesn't constantly check for it:
+By default, Dulse's parser tries to be as clever and sensitive as possible about the underlying content, including checking for mixed content and converting to numeric types as aggressively as possible. If you know more about the underlying content model, you can turn off features as desired, sometimes resulting in a significant performance gain. For example, if you know there's no mixed content, you can instantiate a parser that doesn't constantly check for it:
 
     import dulse
     p = dulse.Parser(mixed_content=False)
@@ -34,7 +38,10 @@ Similarly, if you don't need to convert to numeric types, you can use one of the
 
 Alternatively, you can convert each value using a function of your devising, and passing it into the conversion option of dulse.Parser().
 
+XML out with the builder
+========================
 
+A complementary XML serializer is also available. dulse.to_xml(obj) will build a string from an atomic object or dict, and dulse.write(obj, file) will write to a filename or file handle.
 
 History & approach
 ==================
