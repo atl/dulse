@@ -40,16 +40,14 @@ def STRING(string):
     except AttributeError:
         return None
 
-def NO_CONVERSION(string):
-    return string
+NO_CONVERSION = lambda x: x
 
 class SimpleXMLParser(object):
     """
     Simple XML parser class that completely disregards attributes, and
     mostly disregards order. Text nodes are returned as strings, elements
-    are returned as dict entries. Elements with mixed content must be identified
-    with the `mixed` argument (or with add_mixed and delete_mixed methods), 
-    and are returned as a string of their contents.
+    are returned as dict entries. By default, elements with mixed content
+    are automatically detected and are returned as a string of their contents.
     
     Multiple sibling elements with the same name append their content to a
     list containing all of their previous siblings' content. In this way,
@@ -75,14 +73,15 @@ class SimpleXMLParser(object):
         p.parse(file("sample.xml"))
         
     and results in::
-        {u'author': u'Me',
-         u'content': u"<h1>Chapter 1</h1><p><em>These</em> are the times that\n    try mens' soles....</p>",
-         u'date': u'23 April 2009',
-         u'endnote': [u'This is the first.', u'This is the last.'],
-         u'title': u'My Book'}
+        {'author': 'Me',
+         'content': {'h1': 'Chapter 1',
+                     'p': "<em>These</em> are the times that\n      try mens' soles...."},
+         'date': '23 April 2009',
+         'endnote': ['This is the first.', 'This is the last.'],
+         'title': 'My Book'}
     
     """
-    def __init__(self, conversion=None, mixed_content=True):
+    def __init__(self, conversion=None, mixed_content=True, mixed_elements=None):
         self.events = None
         if conversion:
             self.conversion = conversion
@@ -90,6 +89,8 @@ class SimpleXMLParser(object):
             self.conversion = NUMBER
         if not mixed_content:
             self.is_mixed = lambda x: False
+        if mixed_elements:
+            self.is_mixed = lambda x: x.tag in mixed_elements
     
     @staticmethod
     def is_mixed(ele):
@@ -152,3 +153,11 @@ class SimpleXMLParser(object):
         d = self._parse()
         buf.close()
         return d
+
+def parse(stream_or_string, **kwargs):
+    p = SimpleXMLParser(**kwargs)
+    return p.parse(stream_or_string)
+
+def parse_string(string, **kwargs):
+    p = SimpleXMLParser(**kwargs)
+    return p.parse_string(string)

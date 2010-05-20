@@ -6,11 +6,14 @@ Dulse is a module for when XML is probably too sophisticated a format, but you'r
 Un-features
 ===========
 
+It's generally poor policy to define something in terms of what it is not. However, because XML parsers are well-known and well-represented in Python, it is instructive here to list what differs from the usual list of features in an XML parser.
+
 Dulse does not support XML attributes. They don't fit into the simple model. If XML attributes are important to you, then you should go elsewhere.
-Dulse begrudgingly supports mixed content, unmarshalling the whole span of mixed content as a string type by default.
 Dulse is non-uniform. XML elements are instantiated as dicts, strings, or numeric types throughout, depending on their content. Collections of elements may appear as dicts, lists, or atomic types, again, depending on context.
 Dulse does not respect document order throughout. Because it uses dicts as the basic storage unit, mapping element name to element content, key ordering is arbitrary. However, because sibling elements that share the same name are placed into a list, their relative order with respect to their mutual parent element is preserved.
-Dulse neither cares about nor preserves the root element.
+Dulse begrudgingly supports mixed content, unmarshalling the whole span of mixed content as a string type by default.
+Dulse neither preserves nor cares about the root element.
+Dulse is unapologetically lossy. Besides the ordering and attribute simplifications, it strips whitespace and ignores comments. You are highly unlikely to be able to reproduce the input from the output.
 
 Customization
 =============
