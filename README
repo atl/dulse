@@ -1,0 +1,37 @@
+Dumb, but light & simple module for the extensible markup language.
+Dicts, unicode & lists seem enough.
+
+Dulse is a module for when XML is probably too sophisticated a format, but you're using it anyway. Dulse is lossy with respect to the XML specification, but its compromises are designed to simplify access by using a small repertoire of native Python datatypes: dicts, unicode, lists, and (optionally) floats and ints. In this respect, it draws heavily from JSON for its inspiration.
+
+Un-features
+===========
+
+Dulse does not support XML attributes. They don't fit into the simple model. If XML attributes are important to you, then you should go elsewhere.
+Dulse begrudgingly supports mixed content, unmarshalling the whole span of mixed content as a string type by default.
+Dulse is non-uniform. XML elements are instantiated as dicts, strings, or numeric types throughout, depending on their content. Collections of elements may appear as dicts, lists, or atomic types, again, depending on context.
+Dulse does not respect document order throughout. Because it uses dicts as the basic storage unit, mapping element name to element content, key ordering is arbitrary. However, because sibling elements that share the same name are placed into a list, their relative order with respect to their mutual parent element is preserved.
+Dulse neither cares about nor preserves the root element.
+
+Customization
+=============
+
+By default, Dulse tries to be as clever and sensitive as possible about the underlying content, including checking for mixed content and converting to numeric types as aggressively as possible. If you know more about the underlying content model, you can turn off features as desired. For example, if you know there's no mixed content, you can instantiate a parser that doesn't constantly check for it:
+
+    import dulse
+    p = dulse.Parser(mixed_content=False)
+    d = p.parse("hamlet.xml")
+
+Similarly, if you don't need to convert to numeric types, you can use one of the provided conversion functions, NUMBER (default), STRING, or NO_CONVERSION:
+
+    import dulse
+    p = dulse.Parser(conversion=dulse.STRING)
+    d = p.parse("hamlet.xml")
+
+Alternatively, you can convert each value using a function of your devising, and passing it into the conversion option of dulse.Parser().
+
+
+
+History & approach
+==================
+
+Dulse began as an exercise in the pulldom and in trying to unify access between different textual encodings. The unifying project fell by the wayside, but I revisited the code for another project that perhaps should have used JSON. The basic design worked well, but then I did some basic speed profiling, and discovered that although it was simple, our approach using the pulldom wasn't necessarily as fast as expected. After reworking the code to use ElementTree, the module was ready to be let out into the wild.

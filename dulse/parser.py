@@ -131,18 +131,7 @@ class SimpleXMLParser(object):
                     return tonum(d)
             (event, currnode) = self.events.next()
     
-    def parse(self, stream_or_string):
-        if isinstance(stream_or_string, basestring):
-            stream = open(stream_or_string)
-        else:
-            stream = stream_or_string
-        self.events = pulldom.DOMEventStream(stream, self._parser, pulldom.default_bufsize)
-        d = self._parse()
-        stream.close()
-        return d
-    
     def _parse(self):
-        self._parser.reset()
         depth = 0
         d = {}
         for event, node in self.events:
@@ -155,11 +144,30 @@ class SimpleXMLParser(object):
                 addtodict(d, node.nodeName, self.get_simple_xml_content(node.nodeName))
         return d
     
+    def parse(self, stream_or_string):
+        if isinstance(stream_or_string, basestring):
+            stream = open(stream_or_string)
+        else:
+            stream = stream_or_string
+        self._parser.reset()
+        self.events = pulldom.DOMEventStream(stream, self._parser, pulldom.default_bufsize)
+        d = self._parse()
+        stream.close()
+        return d
+    
     def parse_string(self, string):
         bufsize = len(string)
         buf = StringIO(string)
+        self._parser.reset()
         self.events = pulldom.DOMEventStream(buf, self._parser, bufsize)
         d = self._parse()
         buf.close()
         return d
 
+def parse(stream_or_string):
+    p = SimpleXMLParser()
+    return p.parse(stream_or_string)
+
+def parse_string(string):
+    p = SimpleXMLParser()
+    return p.parse_string(string)
